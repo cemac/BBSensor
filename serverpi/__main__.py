@@ -147,7 +147,7 @@ while True:
 
     if STOP:break
 
-    hour = '%02d'%datetime.now().hour
+    hour = datetime.now().hour
 
     if (hour > SCHOOL[0]) and (hour < SCHOOL[1]):
 
