@@ -27,8 +27,7 @@ DHT_module = False
 #assert SAMPLE_SLEEP > 10
 
 ### hours (not inclusive)
-SCHOOL = ['9','15'] # stage db during school hours
-NIGHT = ['18','07'] # upload centrally on evening
+SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
 
 ########################################################
 ## Lib Imports
@@ -113,7 +112,7 @@ def runcycle():
                 float(rh),
                 float(pm['Sampling Period']),
                 int(pm['Reject count glitch']),
-                now.strftime("%s"),
+                int(now.strftime("%s")),
             ] )
 
         if STOP:break
@@ -150,7 +149,7 @@ while True:
 
     hour = '%02d'%datetime.now().hour
 
-    if hour > SCHOOL[0] or hour < SCHOOL[1]:
+    if (hour > SCHOOL[0]) and (hour < SCHOOL[1]):
 
         if DATE != LAST_SAVE:
 
@@ -173,8 +172,7 @@ while True:
                 print('staging complete', DATE, hour)
                 LAST_SAVE = DATE
 
-    #if hour > NIGHT[0] or hour < NIGHT[1]:
-    if hour == 0 or hour == 12:
+    if (hour > SCHOOL[0]) or (hour < SCHOOL[1]):
 
         if DATE != LAST_UPLOAD:
             if upload.online():
