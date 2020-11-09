@@ -1,6 +1,6 @@
 import sqlite3,os
 
-filename = '/server.db'
+filename = '/sensor.db'
 
 # if we are root, write to root dir
 user = os.popen('echo $USER').read().strip()

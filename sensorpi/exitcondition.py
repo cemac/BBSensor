@@ -2,7 +2,7 @@
 Ensure we can do a controlled exit when pressing ctrl+c
 '''
 ### Failure on exit params
-import sys,time
+import sys,time,datetime
 
 import RPi.GPIO as GPIO
 
@@ -52,14 +52,22 @@ def onexit():
     else:
         print("natural death")
 
-    print('Attempting to exit in a controlled Manner \n')
+    print('Attempting to exit in a controlled Manner \n',datetime.datetime.now(),'\n')
+    
 
     from .import R1
     R1.alpha.off()
     from . import db
     try:db.conn.commit()
     except db.sqlite3.ProgrammingError: None
-    db.conn.close()
+    try:db.conn.close()
+    except:None
+    try:
+        from . import gps
+        gps.pinoff()
+    except:None
+    from . import power
+    power.ledon()
 
 import atexit
 atexit.register(onexit)

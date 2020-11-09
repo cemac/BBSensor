@@ -38,3 +38,14 @@ This contains:
 ## Create a new database
 `python -m serverpi.db` and type `yes`
 
+
+
+
+### Debug corruption on device
+
+```
+find .git/objects/ -size 0 -exec rm -f {} \;
+git fetch origin
+
+git reset --hard origin/
+```

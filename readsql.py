@@ -8,7 +8,7 @@ sudo apt install python3-numpy
 '''
 
 # Read sqlite query results into a pandas DataFrame
-conn = sqlite3.connect("../server.db")
+conn = sqlite3.connect("/root/sensor.db")
 df = pd.read_sql_query("SELECT * from MEASUREMENTS", conn)
 
 
