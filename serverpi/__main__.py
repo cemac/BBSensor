@@ -151,6 +151,8 @@ while True:
 
     if (hour > SCHOOL[0]) and (hour < SCHOOL[1]):
 
+        DATE = date.today().strftime("%d/%m/%Y")
+
         if DATE != LAST_SAVE:
 
             stage_success = upload.stage(SERIAL, db.conn)
