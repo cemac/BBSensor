@@ -53,9 +53,9 @@ def onexit():
         print("natural death")
 
     print('Attempting to exit in a controlled Manner \n',datetime.datetime.now(),'\n')
-    
 
-    from .import R1
+
+    from . import R1
     R1.alpha.off()
     from . import db
     try:db.conn.commit()
