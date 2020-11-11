@@ -38,7 +38,11 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
     # Update the repo, with retries incase the sensor is not connected to the internet.
 
     while [ $COUNT -lt $RETRIES ]; do
-        cd ${LOC}/BBSensor && git pull >> ${LOC}/git.log;
+      if $(cd ${LOC}/BBSensor && git status --branch --porcelain | grep -q behind); then
+          cd ${LOC}/BBSensor && git merge >> ${LOC}/git.log
+      else
+          cd ${LOC}/BBSensor && git pull >> ${LOC}/git.log
+      fi
         if [ $? -eq 0 ]; then
             RETRIES=0
             break
