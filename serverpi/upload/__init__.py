@@ -76,6 +76,9 @@ def sync():
     print (sensorfiles)
 
     #Merge the various DB and upload to AWS
-    merge.mergelist(serverfiles[0], sensorfiles)
+    success = merge.mergelist(serverfiles[0], sensorfiles)
 
-    return True
+    if success:
+        return True
+    else:
+        return False
