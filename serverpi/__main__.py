@@ -174,25 +174,25 @@ while True:
                 print('staging complete', DATE, hour)
                 LAST_SAVE = DATE
 
-    #elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
+    elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
 
-    if DATE != LAST_UPLOAD:
-        if upload.online():
-            #check if connected to wifi
-            ## SYNC
-            upload.sync()
+        if DATE != LAST_UPLOAD:
+            if upload.online():
+                #check if connected to wifi
+                ## SYNC
+                upload.sync()
 
-            ## update time!
-            os.system('sudo timedatectl &')
+                ## update time!
+                os.system('sudo timedatectl &')
 
-            ## run git pull
-            branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
-            os.system("git fetch -q origin {}".format(branchname))
-            if not (os.system("git status --branch --porcelain | grep -q behind")):
-                STOP = True
+                ## run git pull
+                branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
+                os.system("git fetch -q origin {}".format(branchname))
+                if not (os.system("git status --branch --porcelain | grep -q behind")):
+                    STOP = True
 
-            print('upload complete', DATE, hour)
-            LAST_UPLOAD = DATE
+                print('upload complete', DATE, hour)
+                LAST_UPLOAD = DATE
 
 print('exiting- STOP:',STOP)
 db.conn.commit()

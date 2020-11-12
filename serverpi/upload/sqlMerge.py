@@ -9,7 +9,7 @@ class sqlMerge(object):
         self.db_b = None
 
     def merge(self, file_a, file_b):
-        
+
         self.db_a = sqlite3.connect(file_a)
 
         cursor_a = self.db_a.cursor()
@@ -18,12 +18,12 @@ class sqlMerge(object):
         table_list=[]
         for table_item in cursor_a.fetchall():
             table_list.append(table_item[0])
-        
+
         cursor_a = self.db_a.cursor()
-        
+
         cmd = "attach ? as toMerge"
         cursor_a.execute(cmd, (file_b, ))
-        
+
         for table_name in table_list:
 
             new_table_name = table_name + "_new"
@@ -31,13 +31,13 @@ class sqlMerge(object):
             try:
                 cmd = "CREATE TABLE IF NOT EXISTS {0} AS SELECT * FROM {1};".format(new_table_name,table_name)
                 cursor_a.execute(cmd)
-                       
+
                 cmd = "INSERT INTO {0} SELECT * FROM toMerge.{1};".format(new_table_name,table_name)
                 cursor_a.execute(cmd)
 
                 cursor_a.execute("DROP TABLE IF EXISTS " + table_name);
-                cursor_a.execute("ALTER TABLE " + new_table_name + " RENAME TO " + table_name);        
-                
+                cursor_a.execute("ALTER TABLE " + new_table_name + " RENAME TO " + table_name);
+
                 self.db_a.commit()
 
             except sqlite3.OperationalError:
@@ -51,11 +51,13 @@ class sqlMerge(object):
                     self.db_a.close()
 
         return
-    
+
     def mergelist(self, file_a, merge_list):
-        
+
         from datetime import datetime
-        
+        from shutil import copy2
+        from os import remove, path, makedirs
+
         try:
             assert type(merge_list) == list
         except (AssertionError):
@@ -64,7 +66,7 @@ class sqlMerge(object):
         except:
             print ('Unexpected Error')
             raise
-            
+
             try:
                 assert os.path.exists(file_a)
             except (AssertionError):
@@ -73,9 +75,9 @@ class sqlMerge(object):
             except:
                 print ('Unexpected Error')
                 raise
-            
+
         for file in merge_list:
-            
+
             try:
                 assert os.path.exists(file)
             except (AssertionError):
@@ -84,21 +86,35 @@ class sqlMerge(object):
             except:
                 print ('Unexpected Error')
                 raise
-            
-            self.merge(file_a, file)
-            
-        timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
-        
-        uploadfile = '.'.join(file_a.split('.')[:-1])+timestamp+'.'+file_a.split('.')[-1] # filename with timestamp added, preserving all . characters       
 
-        self.upload_s3(file_a,'bib-pilot-bucket',os.path.split(uploadfile)[1])
-    
+            self.merge(file_a, file)
+
+        timestamp = datetime.utcnow().strftime("%Y%m%d%H%M%S")
+
+        #uploadfile = '.'.join(file_a.split('.')[:-1])+timestamp+'.'+file_a.split('.')[-1] # filename with timestamp added, preserving all . characters
+        uploadfile = "upload"+timestamp+".db"
+
+        savepath = '/home/serverpi/uploadedData'
+
+        self.upload_s3(file_a,'bib-pilot-bucket',uploadfile)
+
+        if not path.exists(savepath):
+            print('Directory to store uploaded data'
+                  + ' does not exist\nAttempting to create:')
+        makedirs(savepath)
+
+        copy2(file_a, os.path.join(savepath,uploadfile)
+
+        for file in merge_list:
+            remove(file)
+        remove(file_a)
+
     def upload_s3(self, file_name, bucket, object_name=None):
-        
+
         import boto3
         import logging
         from botocore.exceptions import ClientError
-        
+
         """Upload a file to an S3 bucket
 
             :param file_name: File to upload
@@ -106,7 +122,7 @@ class sqlMerge(object):
             :param object_name: S3 object name. If not specified then file_name is used
             :return: True if file was uploaded, else False
         """
-        
+
         # If S3 object_name was not specified, use file_name
         if object_name is None:
             object_name = file_name
@@ -125,7 +141,7 @@ class sqlMerge(object):
     #def upload_sp (self, file_a, username, password):
     #
     #    from office365.runtime.auth.authentication_context import AuthenticationContext
-    #    from office365.sharepoint.client_context import ClientContext   
+    #    from office365.sharepoint.client_context import ClientContext
     #    from datetime import datetime
     #
     #    baseurl = 'https://leeds365.sharepoint.com'
@@ -141,4 +157,4 @@ class sqlMerge(object):
     #        file_content = content_file.read()
     #
     #    dir, name = os.path.split(remotepath)
-    #    file = ctx.web.get_folder_by_server_relative_url(dir).upload_file(name, file_content).execute_query()            
+    #    file = ctx.web.get_folder_by_server_relative_url(dir).upload_file(name, file_content).execute_query()
