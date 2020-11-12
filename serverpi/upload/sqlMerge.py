@@ -55,7 +55,7 @@ class sqlMerge(object):
     def mergelist(self, file_a, merge_list):
 
         from datetime import datetime
-        from shutil import copy2
+        from shutil import copy2, move
         from os import remove, path, makedirs
 
         try:
@@ -75,6 +75,8 @@ class sqlMerge(object):
             except:
                 print ('Unexpected Error')
                 raise
+
+        copy2(file_a,file_a+"_bak")
 
         for file in merge_list:
 
@@ -96,18 +98,29 @@ class sqlMerge(object):
 
         savepath = '/home/serverpi/uploadedData'
 
-        self.upload_s3(file_a,'bib-pilot-bucket',uploadfile)
-
         if not path.exists(savepath):
             print('Directory to store uploaded data'
-                  + ' does not exist\nAttempting to create:')
-        makedirs(savepath)
+                + ' does not exist\nAttempting to create:')
+            makedirs(savepath)
 
-        copy2(file_a, os.path.join(savepath,uploadfile))
+        success=self.upload_s3(file_a,'bib-pilot-bucket',uploadfile)
 
-        for file in merge_list:
-            remove(file)
-        remove(file_a)
+        if success:
+
+            copy2(file_a, os.path.join(savepath,uploadfile))
+
+            for file in merge_list:
+                remove(file)
+            remove(file_a)
+            remove(file_a+"_bak")
+
+            return True
+
+        else:
+
+            move(file_a+"_bak", file_a)
+
+            return False
 
     def upload_s3(self, file_name, bucket, object_name=None):
 
