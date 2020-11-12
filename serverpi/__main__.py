@@ -174,7 +174,7 @@ while True:
                 print('staging complete', DATE, hour)
                 LAST_SAVE = DATE
 
-    if (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
+    elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
 
         if DATE != LAST_UPLOAD:
             if upload.online():
