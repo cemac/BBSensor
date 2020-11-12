@@ -176,7 +176,7 @@ while True:
 
     elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
 
-        if DATE != LAST_UPLOAD:
+        #if DATE != LAST_UPLOAD:
             if upload.online():
                 #check if connected to wifi
                 ## SYNC
