@@ -182,17 +182,19 @@ while True:
                 ## SYNC
                 upload.sync()
 
-                ## update time!
-                os.system('sudo timedatectl &')
-
-                ## run git pull
-                branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
-                os.system("git fetch -q origin {}".format(branchname))
-                if not (os.system("git status --branch --porcelain | grep -q behind")):
-                    STOP = True
-
                 print('upload complete', DATE, hour)
                 LAST_UPLOAD = DATE
+
+            ## update time!
+            os.system('sudo timedatectl &')
+
+            ## run git pull
+            branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
+            os.system("git fetch -q origin {}".format(branchname))
+            if not (os.system("git status --branch --porcelain | grep -q behind")):
+                STOP = True
+
+
 
 print('exiting- STOP:',STOP)
 db.conn.commit()
