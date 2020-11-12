@@ -103,7 +103,7 @@ class sqlMerge(object):
                   + ' does not exist\nAttempting to create:')
         makedirs(savepath)
 
-        copy2(file_a, os.path.join(savepath,uploadfile)
+        copy2(file_a, os.path.join(savepath,uploadfile))
 
         for file in merge_list:
             remove(file)
