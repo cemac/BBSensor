@@ -1,3 +1,44 @@
+#!/usr/bin/env/python3
+# -*- coding: utf-8 -*-
+
+"""
+Insert description here
+
+Project: FAZE-In
+
+Usage : __main__.py arg1 arg2 arg3
+
+Args:
+    arg1: Description
+    arg2: Description
+    arg3: Description
+
+"""
+
+# Built-in/Generic Imports
+import os
+import sys
+#...
+
+# Libs
+import numpy as np
+import pandas as pd
+#...
+
+#Own Modules
+from {path} import {class}
+
+__author__ = "Christopher Symonds"
+__copyright__ = "Copyright {year}, University of Leeds"
+__credits__ = ["Christopher Symonds", "{credit_list}"]
+__license__ = "MIT"
+__version__ = "{major}.{minor}.{rel}"
+__maintainer__ = "{maintainer}"
+__email__ = "C.C.Symonds@leeds.ac.uk"
+__status__ = "{dev_status}"
+
+
+
 '''
 SERVERPI LIBRARY
 
@@ -27,7 +68,7 @@ DHT_module = False
 #assert SAMPLE_SLEEP > 10
 
 ### hours (not inclusive)
-SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
+SCHOOL = [9,17] # stage db during school hours, and upload outside these hours
 
 ########################################################
 ## Lib Imports
