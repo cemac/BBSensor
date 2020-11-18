@@ -47,7 +47,7 @@ LAST_UPLOAD = None
 DHT_module = False
 
 ### hours (not inclusive)
-SCHOOL = [9,17] # stage db during school hours, and upload outside these hours
+SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
 
 def interrupt(channel):
     print ("Pull Down on GPIO 21 detected: exiting program")
