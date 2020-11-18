@@ -2,56 +2,38 @@
 # -*- coding: utf-8 -*-
 
 """
-Insert description here
+SERVERPI LIBRARY
 
-Project: FAZE-In
+Project: Born in Bradford Breathes
 
-Usage : __main__.py arg1 arg2 arg3
-
-Args:
-    arg1: Description
-    arg2: Description
-    arg3: Description
+Usage : python3 -m serverpi
 
 """
 
 # Built-in/Generic Imports
-import os
-import sys
-#...
-
-# Libs
-import numpy as np
-import pandas as pd
-#...
-
-#Own Modules
-from {path} import {class}
-
-__author__ = "Christopher Symonds"
-__copyright__ = "Copyright {year}, University of Leeds"
-__credits__ = ["Christopher Symonds", "{credit_list}"]
-__license__ = "MIT"
-__version__ = "{major}.{minor}.{rel}"
-__maintainer__ = "{maintainer}"
-__email__ = "C.C.Symonds@leeds.ac.uk"
-__status__ = "{dev_status}"
-
-
-
-'''
-SERVERPI LIBRARY
-
-D.Ellis CEMAC
-C.Symonds CEMAC
-K.Pringle UOL
-J.McQuaid UOL
-
-'''
-
-## imports
 import time,sys,os
 from datetime import date,datetime
+
+#Own Modules
+from .tests import pyvers
+from .geolocate import lat,lon,alt
+from . import R1
+alpha = R1.alpha
+from .exitcondition import GPIO
+from .crypt import scramble
+from . import db
+from .db import builddb
+from . import upload
+if DHT_module: from . import DHT
+
+__author__ = "Christopher Symonds, Dan Ellis"
+__copyright__ = "Copyright 2020, University of Leeds"
+__credits__ = ["Christopher Symonds", "Dan Ellis", "Jim McQuaid", "Kirsty Pringle"]
+__license__ = "MIT"
+__version__ = "0.3.4"
+__maintainer__ = "C. Symonds"
+__email__ = "C.C.Symonds@leeds.ac.uk"
+__status__ = "Prototype"
 
 ## runtime constants
 DEBUG = True
@@ -64,28 +46,8 @@ LAST_SAVE = None
 LAST_UPLOAD = None
 DHT_module = False
 
-# SAMPLE_SLEEP = 0#60*.5#(15-1) # in seconds
-#assert SAMPLE_SLEEP > 10
-
 ### hours (not inclusive)
 SCHOOL = [9,17] # stage db during school hours, and upload outside these hours
-
-########################################################
-## Lib Imports
-########################################################
-
-from .tests import pyvers
-from .geolocate import lat,lon,alt
-from . import R1
-#from R1 import alpha,info,poll,keep
-alpha = R1.alpha
-from .exitcondition import GPIO
-from .crypt import scramble
-from . import db
-from .db import builddb
-from . import upload
-if DHT_module: from . import DHT
-
 
 def interrupt(channel):
     print ("Pull Down on GPIO 21 detected: exiting program")
