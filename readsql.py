@@ -20,4 +20,6 @@ df = pd.read_sql_query("SELECT * from MEASUREMENTS", conn)
 
 print(df['TIME PM1 PM3 PM10 SP RC'.split()].tail(n=50))
 
+#df.to_csv('./Measurements.csv', columns = ['TIME', 'PM1', 'PM3', 'PM10', 'SP', 'RC'], index=False)
+
 conn.close()
