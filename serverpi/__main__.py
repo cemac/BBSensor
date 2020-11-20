@@ -10,9 +10,30 @@ Usage : python3 -m serverpi
 
 """
 
+__author__ = "Christopher Symonds, Dan Ellis"
+__copyright__ = "Copyright 2020, University of Leeds"
+__credits__ = ["Christopher Symonds", "Dan Ellis", "Jim McQuaid", "Kirsty Pringle"]
+__license__ = "MIT"
+__version__ = "0.3.5"
+__maintainer__ = "C. Symonds"
+__email__ = "C.C.Symonds@leeds.ac.uk"
+__status__ = "Prototype"
+
+
 # Built-in/Generic Imports
 import time,sys,os
 from datetime import date,datetime
+
+## runtime constants
+DEBUG = True
+SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
+DATE = date.today().strftime("%d/%m/%Y")
+STOP = False
+TYPE=1# { 1 = static, 2 = dynamic, 3 = isolated_static}
+SAMPLE_LENGTH = 10 # in seconds
+LAST_SAVE = None
+LAST_UPLOAD = None
+DHT_module = False
 
 #Own Modules
 from .tests import pyvers
@@ -25,26 +46,6 @@ from . import db
 from .db import builddb
 from . import upload
 if DHT_module: from . import DHT
-
-__author__ = "Christopher Symonds, Dan Ellis"
-__copyright__ = "Copyright 2020, University of Leeds"
-__credits__ = ["Christopher Symonds", "Dan Ellis", "Jim McQuaid", "Kirsty Pringle"]
-__license__ = "MIT"
-__version__ = "0.3.4"
-__maintainer__ = "C. Symonds"
-__email__ = "C.C.Symonds@leeds.ac.uk"
-__status__ = "Prototype"
-
-## runtime constants
-DEBUG = True
-SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
-DATE = date.today().strftime("%d/%m/%Y")
-STOP = False
-TYPE=1# { 1 = static, 2 = dynamic, 3 = isolated_static}
-SAMPLE_LENGTH = 10 # in seconds
-LAST_SAVE = None
-LAST_UPLOAD = None
-DHT_module = False
 
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
