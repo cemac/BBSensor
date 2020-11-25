@@ -64,6 +64,32 @@ R1.clean(alpha)
 '''
 rpi serial number as hostname
 '''
+########################################################
+## Retrieving previous upload and staging dates
+########################################################
+
+if os.path.exists(os.path.join(__RDIR__,'.uploads')):
+    with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
+        lines = f.readlines()
+    for line in lines:
+        if 'LAST_SAVE = ' in line:
+            LAST_SAVE = line[12:].strip()
+        elif 'LAST_UPLOAD = ' in line:
+            LAST_UPLOAD = line[14:].strip()
+    if LAST_SAVE == None:
+        with open (os.path.join(__RDIR__,'.uploads'),'a') as f:
+            f.write('LAST_SAVE = None\n')
+        LAST_SAVE = 'None'
+    if LAST_UPLOAD == None:
+        with open (os.path.join(__RDIR__,'.uploads'),'a') as f:
+            f.write('LAST_UPLOAD = None\n')
+        LAST_UPLOAD = 'None'
+else:
+    with open (os.path.join(__RDIR__,'.uploads'),'w') as f:
+        f.write("LAST_SAVE = None\n")
+        f.write("LAST_UPLOAD = None\n")
+    LAST_SAVE = 'None'
+    LAST_UPLOAD = 'None'
 
 ########################################################
 ## Main Loop
@@ -176,6 +202,13 @@ while True:
                 builddb.builddb(db.conn)
 
                 print('staging complete', DATE, hour)
+
+                with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
+                    lines=f.readlines()
+                with open (os.path.join(__RDIR__,'.uploads'),'w') as f:
+                    for line in lines:
+                        f.write(sub(r'LAST_SAVE = '+LAST_SAVE, 'LAST_SAVE = '+DATE, line))
+
                 LAST_SAVE = DATE
 
     elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
@@ -187,6 +220,13 @@ while True:
                 upload.sync()
 
                 print('upload complete', DATE, hour)
+
+                with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
+                    lines=f.readlines()
+                with open (os.path.join(__RDIR__,'.uploads'),'w') as f:
+                    for line in lines:
+                        f.write(sub(r'LAST_UPLOAD = '+LAST_UPLOAD, 'LAST_UPLOAD = '+DATE, line))
+
                 LAST_UPLOAD = DATE
 
             ## update time!
