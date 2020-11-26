@@ -3,6 +3,9 @@ scripts to run if connected online
 '''
 import os
 from datetime import date,datetime
+from ..log_manager import getlog
+log = getlog(__file__)
+print = log.print
 
 def online():
 
@@ -129,9 +132,15 @@ def copydb(file_name,SERIAL):
 
     return newfile
 
+
+
 def sync(SERIAL,conn):
 
     import pysftp
+    from time import sleep
+    from random import randint
+
+    sleep(randint(10,300))  # Wait a random amount of time between 10 secs and 10 mins to limit overloading serverpi
 
     # if we are root, write to root dir
     user = os.popen('echo $USER').read().strip()

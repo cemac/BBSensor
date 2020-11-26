@@ -1,4 +1,6 @@
 import sqlite3
+from ..log_manager import getlog
+log = getlog(__file__)
 
 def builddb(conn):
 
@@ -38,9 +40,9 @@ def builddb(conn):
     cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
 
     table_counter = 0
-    print("SQL Tables available: \n===================================================\n")
+    log.info("SQL Tables available: \n===================================================\n")
     for table_item in cursor.fetchall():
         current_table = table_item[0]
         table_counter += 1
-        print("-> " + current_table)
-    print("\n===================================================\n")
+        log.info("-> " + current_table)
+    log.info("\n===================================================\n")

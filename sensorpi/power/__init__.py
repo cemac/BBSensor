@@ -29,13 +29,25 @@ terminate = True
 
 def threadblink():
     global terminate
+    terminate = True 
     while terminate:
         ledon()
         time.sleep(1)
         ledoff()
+        
+def threadblinkupdate():
+    global terminate
+    terminate = True 
+    while terminate:
+        ledon()
+        time.sleep(3)
+        ledoff()
+        time.sleep(1)
+     
 
 def threadblinkupdate():
     global terminate
+    teminate = True
     while terminate:
         ledon()
         time.sleep(3)

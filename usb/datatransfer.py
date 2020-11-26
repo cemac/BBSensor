@@ -8,6 +8,7 @@ os.system('echo none | sudo tee /sys/class/leds/led0/trigger')
 def ledon():
     os.system('echo 0 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
 
+
 def ledoff():
     os.system('echo 1 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
 
@@ -30,13 +31,12 @@ for u in os.popen('sudo blkid').readlines():
     if '/dev/sd' not in loc[0]: continue
     loc+=re.findall(r'"[^"]+"',u)
     columns = ['loc']+re.findall(r'\b(\w+)=',u)
-
     usbs.append(dict(zip(columns,loc)))
-
-
-
+    
+    
+    
 for u in usbs:
-
+    
     print ('Connecting to %(LABEL)s'%u)
 
     os.system('sudo umount /media')
@@ -45,7 +45,7 @@ for u in usbs:
     if u['UUID']+'\n' not in uuids:
         print('UUID not allowed: %(UUID)s - %(LABEL)s'%u)
         continue
-    if not os.path.exists('/media/transferdata'):
+    if not os.path.exists('/media/transferdata'): 
         print('FAILED on %(LABEL)s'%u)
         continue
     if checksum != os.popen('shasum /media/transferdata/encrypt.pem').read().split(' ')[0]:
@@ -53,18 +53,20 @@ for u in usbs:
         continue
 
     ledoff()
-
+    
     for db in DBs:
         dname = db.rsplit('/',1)[-1]
         print('Transferring',dname)
+        start = time.time()
         mod = os.popen('date -r '+db+' "+%Y_%m_%d_%H%M"').read()
         cmd = 'cp -n %s /media/transferdata/%s_%s_%s'%(db,SERIAL[:16],mod,dname)
         os.system(cmd)# -n for no clobber
         print(cmd)
-
+        print('%d bytes - %.0e seconds'%(os.path.getsize(db),(time.time()-start)/60))
+ 
+        
 
     os.system('sudo umount /media')
-
 
 ledon()
 print('--end--')

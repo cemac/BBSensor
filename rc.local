@@ -19,8 +19,9 @@ sudo timedatectl >> /root/git.log;
 LOC='/root'
 
 if $(cd ${LOC}/BBSensor && git status --branch --porcelain | grep -q behind); then
-    cd ${LOC}/BBSensor && git merge >> ${LOC}/git.log
+    cd ${LOC}/BBSensor && git merge >> ${LOC}/git.log 2>&1
 fi
+
 
 ((count = 20))                            # Maximum number to try.
 while [[ $count -ne 0 ]] ; do
@@ -41,7 +42,8 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
     # Update the repo, with retries incase the sensor is not connected to the internet.
 
     while [ $COUNT -lt $RETRIES ]; do
-        cd ${LOC}/BBSensor && git pull >> ${LOC}/git.log
+        cd ${LOC}/BBSensor && git pull >> ${LOC}/git.log 2>&1
+
         if [ $? -eq 0 ]; then
             RETRIES=0
             break
@@ -51,7 +53,20 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
     done
 fi
 
-sudo timedatectl >> ${LOC}/git.log;
+
+# transfer rules of usb transfer if they dont exist and reboot. 
+if [ ! -f "/etc/udev/rules.d/optional_usb.rules" ]; then
+    echo "Adding USB transfer rules";
+
+    chmod a+x /root/BBSensor/usb/*;
+    cp /root/BBSensor/usb/optional_usb.rules /etc/udev/rules.d/;
+    chmod a+x /etc/udev/rules.d/optional_usb.rules;
+
+    sudo reboot
+fi
+
+sudo timedatectl >> ${LOC}/git.log 2>&1;
+
 
 cd ${LOC}/BBSensor && sudo python3 -m sensorpi >> /root/sensor.log &
 

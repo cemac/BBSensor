@@ -1,66 +1,83 @@
-'''
+#!/usr/bin/env/python3
+# -*- coding: utf-8 -*-
+
+"""
 StaticSensorPI LIBRARY
+A library to run the portable sensors for the born in brandford project.
+Project: Born In Bradford Breathes
+Usage : python3 -m sensorpi
+"""
 
-A library to run the static sensors for the born in brandford project.
-
-Developers:
-    D.Ellis CEMAC @ UOLeeds
-    C.Symonds CEMAC @ UOLeeds
-PIs:
-    K.Pringle UOLeeds
-    J.McQuaid UOLeeds
-
-'''
+__author__ = "Dan Ellis, Christopher Symonds"
+__copyright__ = "Copyright 2020, University of Leeds"
+__credits__ = ["Dan Ellis", "Christopher Symonds", "Jim McQuaid", "Kirsty Pringle"]
+__license__ = "MIT"
+__version__ = "0.3.4"
+__maintainer__ = "C. Symonds"
+__email__ = "C.C.Symonds@leeds.ac.uk"
+__status__ = "Prototype"
 ########################################################
 ##  Imports and constants
 ########################################################
-
+# Built-in/Generic Imports
 import time,sys,os
 from datetime import date,datetime
-import subprocess
+from re import sub
+
+# Check Modules
+from .tests import pyvers
+from .geolocate import lat,lon,alt
+loc = {'lat':lat,'lon':lon,'alt':alt}
+from .log_manager import getlog
+log = getlog(__name__)
+print = log.print ## replace print function with a wrapper
+log.info('########################################################'.replace('#','~'))
+
+# Exec modules
+from .exitcondition import GPIO
+from . import power
+from .crypt import scramble
+from . import db
+from .db import builddb, __RDIR__
+from . import upload
+from . import R1
+
+########################################################
+##  Running Parameters
+########################################################
+
 ## runtime constants
-DEBUG  = True
 SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
 DATE   = date.today().strftime("%d/%m/%Y")
 STOP   = False
-TYPE   = 1 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
-SAMPLE_LENGTH = 10 # in seconds
+TYPE   = 3 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
+LAST_UPLOAD = None
 DHT_module = False
+if DHT_module: from . import DHT
+
 
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours
 
-########################################################
-## Lib Imports
-########################################################
 
-from .tests import pyvers
-from .geolocate import lat,lon,alt
-from . import power
 loading = power.blink_nonblock_inf()
-
-from . import R1
-#from R1 import alpha,info,poll,keep
 alpha = R1.alpha
-from .exitcondition import GPIO
-from .crypt import scramble
-from . import db
-from .db import builddb
-from . import upload
-if DHT_module: from . import DHT
+
 
 def interrupt(channel):
-    print ("Pull Down on GPIO 21 detected: exiting program")
+    log.warning("Pull Down on GPIO 21 detected: exiting program")
     global STOP
     STOP = True
 
 GPIO.add_event_detect(21, GPIO.RISING, callback=interrupt, bouncetime=300)
 
-print('########################################################')
-print('starting',datetime.now())
-R1.clean(alpha)
+log.info('########################################################')
+log.info('starting {}'.format(datetime.now()))
+log.info('########################################################')
 
+
+R1.clean(alpha)
 while loading.isAlive():
     if DEBUG: print('stopping loading blink ...')
     power.stopblink(loading)
@@ -113,8 +130,6 @@ def runcycle():
         now = datetime.utcnow()
 
         pm = R1.poll(alpha)
-
-        #if DEBUG: print(pm)
 
         if float(pm['PM1'])+float(pm['PM10'])  > 0:
             # if there are results.
@@ -187,7 +202,7 @@ while True:
 
     if (hour > SCHOOL[0]) and (hour < SCHOOL[1]):
 
-        if DEBUG: print('School time')
+        log.info('School time')
         ''' at school - try upload'''
         ''' rfkill block wifi; to turn it on, rfkill unblock wifi. For Bluetooth, rfkill block bluetooth and rfkill unblock bluetooth.'''
 
@@ -207,17 +222,13 @@ while True:
                         table_list.append(table_item[0])
 
                     for table_name in table_list:
-                        print ('Dropping table : '+table_name)
+                        log.debug('Dropping table : '+table_name)
                         db.conn.execute('DROP TABLE IF EXISTS ' + table_name)
 
-                    print('rebuilding db')
+                    log.info('rebuilding db')
                     builddb.builddb(db.conn)
 
-                    while loading.isAlive():
-                        power.stopblink(loading)
-                        loading.join(.1)
-
-                    print('upload complete', DATE, hour)
+                    log.debug('upload complete', DATE, hour)
 
                     with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
                         lines=f.readlines()
@@ -227,12 +238,18 @@ while True:
 
                     LAST_SAVE = DATE
 
+                print('stopping blinking')
+                while loading.isAlive():
+                    power.stopblink(loading)
+                    loading.join(.1)
+
+
     elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
 
         if upload.online():
 
             ## update time!
-            os.system('sudo timedatectl &')
+            log.info(os.popen('sudo timedatectl &').read())
 
             ## run git pull
             branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
@@ -243,9 +260,11 @@ while True:
 ########################################################
 ########################################################
 
-print('exiting- STOP:',STOP)
+log.info('exiting - STOP: %s'%STOP)
 db.conn.commit()
 db.conn.close()
 power.ledon()
 if not (os.system("git status --branch --porcelain | grep -q behind")):
+    now = datetime.utcnow().strftime("%F %X")
+    log.critical('Updates available. We need to reboot. Shutting down at %s'%now)
     os.system("sudo reboot")

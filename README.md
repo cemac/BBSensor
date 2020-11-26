@@ -1,6 +1,12 @@
 # BBStaticSensor
 OPC R1 static sensor scripts for Pi3
 
+## Power Led meaning:
+- Led on whist sampling
+- Led off when writing to file
+- blink 1s on loading code
+- blink 3 seconds on upload  (sending data)
+
 
 ## Setup
 ### seting up logger

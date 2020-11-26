@@ -6,6 +6,7 @@
 3. complete 'set up new usb' instructions below
 4. Reboot - `sudo reboot`
 
+
 ## Setup new usb
 1. Plug in USB
 2. run `python3 setup_USB.py`
@@ -21,17 +22,17 @@ Only transfers if the UUID is part of the approved files list
 The correct path must exist
 
 ## Program
-Checks attached devices,
-mounts them and checks authentication.
-If this passes it copies the files
+Checks attached devices, 
+mounts them and checks authentication. 
+If this passes it copies the files 
 
-## Leds- THESE ARE OVERWRITTEN BY OTHER PROGRAMS - so cannot be trusted.
-I suggest trying other files and gauging the transfer time:
+## Leds- THESE ARE OVERWRITTEN BY OTHER PROGRAMS - so cannot be trusted. 
+I suggest trying other files and gauging the transfer time: 
 
 ### Delays
-10 seconds before any transfer happens
+10 seconds before any transfer happens 
 
-## hypothetical leds
+## hypothetical leds 
 Constant. If dark - it may be writing. If lit - likely ok.  
 - Off whilst writing
 - On when finished
@@ -43,6 +44,8 @@ Constant. If dark - it may be writing. If lit - likely ok.
 This has been added to rc.local.
 Move `optional_usb.rules` into `/etc/udev/rules.d/`
 
-### Remove
-`rm /etc/udev/rules.d/optional_usb.rules`
+
+### Remove 
+`rm /etc/udev/rules.d/optional_usb.rules` 
 and comment out in rc.local
+
