@@ -55,7 +55,7 @@ TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
 LAST_UPLOAD = None
 DHT_module = False
-OPC = False
+OPC = True
 
 if DHT_module: from . import DHT
 if OPC:
