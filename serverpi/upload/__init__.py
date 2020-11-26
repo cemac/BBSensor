@@ -2,6 +2,9 @@
 scripts to run if connected online
 '''
 import os
+from .log_manager import getlog
+log = getlog(__name__)
+print = log.print ## replace print function with a wrapper
 
 def online():
 
