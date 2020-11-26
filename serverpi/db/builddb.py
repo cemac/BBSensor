@@ -3,6 +3,7 @@ from ..log_manager import getlog
 log = getlog(__name__)
 print = log.print ## replace print function with a wrapper
 
+
 def builddb(conn):
 
     cursor = conn.cursor()

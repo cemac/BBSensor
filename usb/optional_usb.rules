@@ -1,0 +1,2 @@
+ACTION=="add", SUBSYSTEM=="usb", PROGRAM="/root/BBSensor/usb/on_usb_in.sh"
+ACTION=="remove", SUBSYSTEM=="usb", PROGRAM="/root/BBSensor/usb/on_usb_out.sh"

@@ -4,66 +4,84 @@
 """
 SERVERPI LIBRARY
 
-Project: Born in Bradford Breathes
+A library to run the portable sensors for the born in brandford project.
 
-Usage : python3 -m serverpi
+Project: Born In Bradford Breathes
+
+Usage : python3 -m sensorpi
 
 """
 
 __author__ = "Christopher Symonds, Dan Ellis"
 __copyright__ = "Copyright 2020, University of Leeds"
-__credits__ = ["Christopher Symonds", "Dan Ellis", "Jim McQuaid", "Kirsty Pringle"]
+__credits__ = ["Dan Ellis", "Christopher Symonds", "Jim McQuaid", "Kirsty Pringle"]
 __license__ = "MIT"
 __version__ = "0.3.5"
 __maintainer__ = "C. Symonds"
 __email__ = "C.C.Symonds@leeds.ac.uk"
 __status__ = "Prototype"
 
-
 # Built-in/Generic Imports
 import time,sys,os
 from datetime import date,datetime
+from re import sub
+
+# Check Modules
+from .tests import pyvers
+from .geolocate import lat,lon,alt
+loc = {'lat':lat,'lon':lon,'alt':alt}
+from .log_manager import getlog
+log = getlog(__name__)
+print = log.print ## replace print function with a wrapper
+log.info('########################################################'.replace('#','~'))
+
+# Exec modules
+from .exitcondition import GPIO
+from . import power
+from .crypt import scramble
+from . import db
+from .db import builddb, __RDIR__
+from . import upload
+from . import R1
+########################################################
+##  Running Parameters
+########################################################
 
 ## runtime constants
-DEBUG = True
 SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
-DATE = date.today().strftime("%d/%m/%Y")
-STOP = False
-TYPE=1# { 1 = static, 2 = dynamic, 3 = isolated_static}
-SAMPLE_LENGTH = 10 # in seconds
+DATE   = date.today().strftime("%d/%m/%Y")
+STOP   = False
+TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
 LAST_UPLOAD = None
 DHT_module = False
-
-#Own Modules
-from .tests import pyvers
-from .geolocate import lat,lon,alt
-from . import R1
-alpha = R1.alpha
-from .exitcondition import GPIO
-from .crypt import scramble
-from . import db
-from .db import builddb
-from . import upload
 if DHT_module: from . import DHT
+
+
+
 
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
 
+alpha = R1.alpha
+
+
 def interrupt(channel):
-    print ("Pull Down on GPIO 21 detected: exiting program")
+    log.warning("Pull Down on GPIO 21 detected: exiting program")
     global STOP
     STOP = True
 
 GPIO.add_event_detect(21, GPIO.RISING, callback=interrupt, bouncetime=300)
 
-print('########################################################')
-print('starting',datetime.now())
+log.info('########################################################')
+log.info('starting {}'.format(datetime.now()))
+log.info('########################################################')
+
+    
 R1.clean(alpha)
 
-'''
-rpi serial number as hostname
-'''
+
+
 ########################################################
 ## Retrieving previous upload and staging dates
 ########################################################
@@ -110,31 +128,33 @@ def runcycle():
 
     #(SERIAL,TYPE,d["TIME"],DATE,d["LOC"],d["PM1"],d["PM3"],d["PM10"],d["SP"],d["RC"],)
     '''
-
     global SAMPLE_LENGTH
 
     results = []
     alpha.on()
-    for i in range(SAMPLE_LENGTH-1):
-        now = datetime.utcnow()
+    # for i in range(SAMPLE_LENGTH-1):
+    start = time.time()
+    while time.time()-start < SAMPLE_LENGTH:
+        # now = datetime.utcnow()now.strftime("%H%M%S")
+        #print(time.time()-start , SAMPLE_LENGTH)
 
         pm = R1.poll(alpha)
 
-        if DEBUG: print(pm)
-
-        if float(pm['PM1'])+float(pm['PM10'])  > 0:
-            # if there are results.
+        if float(pm['PM1'])+float(pm['PM10'])  > 0:  #if there are results.
 
             if DHT_module: rh,temp = DHT.read()
             else:
                 temp = pm['Temperature']
                 rh   = pm[  'Humidity' ]
 
-            results.append( [
+            unixtime = int(datetime.utcnow().strftime("%s")) # to the second
+
+
+            results.append([
                 SERIAL,
                 TYPE,
                 now.strftime("%H%M%S"),
-                scramble(('%s_%s_%s'%(lat,lon,alt)).encode('utf-8')),
+                scramble(('%(lat)s_%(lon)s_%(alt)s'%loc).encode('utf-8')),
                 float(pm['PM1']),
                 float(pm['PM2.5']),
                 float(pm['PM10']),
@@ -142,11 +162,11 @@ def runcycle():
                 float(rh),
                 float(pm['Sampling Period']),
                 int(pm['Reject count glitch']),
-                int(now.strftime("%s")),
-            ] )
+                unixtime,
+                ] )
 
         if STOP:break
-        time.sleep(1) # keep as 1
+        time.sleep(.1) # keep as 1
 
     alpha.off()
     time.sleep(1)# Let the rpi turn off the fan
@@ -219,7 +239,7 @@ while True:
                 ## SYNC
                 upload.sync()
 
-                print('upload complete', DATE, hour)
+                log.debug('upload complete', DATE, hour)
 
                 with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
                     lines=f.readlines()
@@ -240,8 +260,8 @@ while True:
 
 
 
-print('exiting- STOP:',STOP)
-db.conn.commit()
-db.conn.close()
 if not (os.system("git status --branch --porcelain | grep -q behind")):
+
+    now = datetime.utcnow().strftime("%F %X")
+    log.critical('Updates available. We need to reboot. Shutting down at %s'%now)
     os.system("sudo reboot")

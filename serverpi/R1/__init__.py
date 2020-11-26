@@ -1,6 +1,9 @@
 import spidev
 import opc
 from time import sleep
+from ..log_manager import getlog
+log = getlog(__file__)
+print = log.print
 
 spi = spidev.SpiDev()
 spi.open(0, 0)
@@ -13,7 +16,7 @@ sleep(1.0)
 try:
 	alpha = opc.OPCR1(spi)
 except Exception as e:
-	print ("Startup Error: {}".format(e))
+	log.error("Startup Error: {}".format(e))
 print (alpha)
 
 
