@@ -8,10 +8,10 @@ os.system('echo none | sudo tee /sys/class/leds/led0/trigger > /dev/null')
 
 
 def ledon():
-    os.system('echo 1 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
+    os.system('echo 0 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
 
 def ledoff():
-    os.system('echo 0 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
+    os.system('echo 1 | sudo tee /sys/class/leds/led0/brightness > /dev/null')
 
 def blink(n = 4 ):
     for i in range(n):

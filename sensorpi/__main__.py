@@ -16,9 +16,11 @@ __version__ = "0.3.4"
 __maintainer__ = "C. Symonds"
 __email__ = "C.C.Symonds@leeds.ac.uk"
 __status__ = "Prototype"
+
 ########################################################
 ##  Imports and constants
 ########################################################
+
 # Built-in/Generic Imports
 import time,sys,os
 from datetime import date,datetime
@@ -52,18 +54,14 @@ DATE   = date.today().strftime("%d/%m/%Y")
 STOP   = False
 TYPE   = 3 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
-LAST_UPLOAD = None
 DHT_module = False
 if DHT_module: from . import DHT
-
 
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours
 
-
-loading = power.blink_nonblock_inf()
 alpha = R1.alpha
-
+loading = power.blink_nonblock_inf()
 
 def interrupt(channel):
     log.warning("Pull Down on GPIO 21 detected: exiting program")
@@ -79,7 +77,7 @@ log.info('########################################################')
 
 R1.clean(alpha)
 while loading.isAlive():
-    if DEBUG: print('stopping loading blink ...')
+    log.debug('stopping loading blink ...')
     power.stopblink(loading)
     loading.join(.1)
 
@@ -143,7 +141,7 @@ def runcycle():
                 SERIAL,
                 TYPE,
                 now.strftime("%H%M%S"),
-                scramble(('%s_%s_%s'%(lat,lon,alt)).encode('utf-8')),
+                scramble(('%(lat)s_%(lon)s_%(alt)s'%loc).encode('utf-8')),
                 float(pm['PM1']),
                 float(pm['PM2.5']),
                 float(pm['PM10']),
@@ -175,13 +173,12 @@ MAIN
 ########################################################
 while True:
     #update less frequenty in loop
-    # DATE = date.today().strftime("%d/%m/%Y")
+    DATE = date.today().strftime("%d/%m/%Y")
 
     power.ledoff()
 
     ## run cycle
     d = runcycle()
-    #if DEBUG:print(d[-1])
 
     ''' add to db'''
     db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,SP,RC,UNIXTIME) \
@@ -192,7 +189,7 @@ while True:
     #if DEBUG:
         # if bserial : os.system("screen -S ble -X stuff 'sudo echo \"%s\" > /dev/rfcomm1 ^M' " %'_'.join([str(i) for i in d[-1]]))
 
-    if DEBUG: print('saveddb')
+    log.debug('DB Saved at {}'.format(datetime.utcnow().strftime("%X")))
 
     power.ledon()
 
@@ -238,7 +235,6 @@ while True:
 
                     LAST_SAVE = DATE
 
-                print('stopping blinking')
                 while loading.isAlive():
                     power.stopblink(loading)
                     loading.join(.1)
