@@ -23,8 +23,8 @@ __status__ = "Prototype"
 
 # Built-in/Generic Imports
 import time,sys,os
-from datetime import date,datetime
 from re import sub
+from datetime import date,datetime
 
 # Check Modules
 from .tests import pyvers
@@ -42,7 +42,7 @@ from .crypt import scramble
 from . import db
 from .db import builddb, __RDIR__
 from . import upload
-from . import R1
+
 ########################################################
 ##  Running Parameters
 ########################################################
@@ -55,16 +55,16 @@ TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
 LAST_UPLOAD = None
 DHT_module = False
+OPC = False
+
 if DHT_module: from . import DHT
-
-
+if OPC:
+    from . import R1
+    alpha = R1.alpha
 
 
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours, and upload outside these hours
-
-alpha = R1.alpha
-
 
 def interrupt(channel):
     log.warning("Pull Down on GPIO 21 detected: exiting program")
@@ -77,8 +77,8 @@ log.info('########################################################')
 log.info('starting {}'.format(datetime.now()))
 log.info('########################################################')
 
-    
-R1.clean(alpha)
+
+if OPC: R1.clean(alpha)
 
 
 
@@ -132,11 +132,10 @@ def runcycle():
 
     results = []
     alpha.on()
-    # for i in range(SAMPLE_LENGTH-1):
     start = time.time()
     while time.time()-start < SAMPLE_LENGTH:
-        # now = datetime.utcnow()now.strftime("%H%M%S")
-        #print(time.time()-start , SAMPLE_LENGTH)
+
+        now = datetime.utcnow()
 
         pm = R1.poll(alpha)
 
@@ -147,8 +146,7 @@ def runcycle():
                 temp = pm['Temperature']
                 rh   = pm[  'Humidity' ]
 
-            unixtime = int(datetime.utcnow().strftime("%s")) # to the second
-
+            unixtime = int(now.strftime("%s")) # to the second
 
             results.append([
                 SERIAL,
@@ -188,12 +186,14 @@ MAIN
 while True:
     #update less frequenty in loop
     #DATE = date.today().strftime("%d/%m/%Y")
-    d = runcycle()
 
-    db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,SP,RC,UNIXTIME) \
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", d );
+    if OPC:
+        d = runcycle()
 
-    db.conn.commit() # dont forget to commit!
+        db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,SP,RC,UNIXTIME) \
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", d );
+
+        db.conn.commit() # dont forget to commit!
 
     if STOP:break
 
@@ -215,13 +215,13 @@ while True:
                     table_list.append(table_item[0])
 
                 for table_name in table_list:
-                    print ('Dropping table : '+table_name)
+                    log.debug ('Dropping table : '+table_name)
                     db.conn.execute('DROP TABLE IF EXISTS ' + table_name)
 
-                print('rebuilding db')
+                log.debug('rebuilding db')
                 builddb.builddb(db.conn)
 
-                print('staging complete', DATE, hour)
+                log.info('staging complete', DATE, hour)
 
                 with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
                     lines=f.readlines()
@@ -250,7 +250,7 @@ while True:
                 LAST_UPLOAD = DATE
 
             ## update time!
-            os.system('sudo timedatectl &')
+            log.info(os.popen('sudo timedatectl &').read())
 
             ## run git pull
             branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
