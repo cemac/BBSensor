@@ -12,7 +12,7 @@ __author__ = "Dan Ellis, Christopher Symonds"
 __copyright__ = "Copyright 2020, University of Leeds"
 __credits__ = ["Dan Ellis", "Christopher Symonds", "Jim McQuaid", "Kirsty Pringle"]
 __license__ = "MIT"
-__version__ = "0.3.4"
+__version__ = "0.4.2"
 __maintainer__ = "C. Symonds"
 __email__ = "C.C.Symonds@leeds.ac.uk"
 __status__ = "Prototype"
@@ -52,6 +52,7 @@ from . import R1
 SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
 DATE   = date.today().strftime("%d/%m/%Y")
 STOP   = False
+SAMPLE_LENGTH = 10
 TYPE   = 3 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
 DHT_module = False
