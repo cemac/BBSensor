@@ -206,7 +206,7 @@ while True:
 
         if DATE != LAST_SAVE:
 
-            stage_success = upload.stage(SERIAL, db.conn)
+            stage_success = upload.stage(SERIAL, __RDIR__)
 
             if stage_success:
                 cursor=db.conn.cursor()
@@ -222,7 +222,7 @@ while True:
                 log.debug('rebuilding db')
                 builddb.builddb(db.conn)
 
-                log.info('staging complete', DATE, hour)
+                log.info('staging complete on {}, hour = {}'.format(DATE, hour))
 
                 with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
                     lines=f.readlines()
@@ -234,24 +234,28 @@ while True:
 
     elif (hour < SCHOOL[0]) or (hour > SCHOOL[1]):
 
-        if DATE != LAST_UPLOAD:
-            if upload.online():
+        if upload.online():
+            if DATE != LAST_UPLOAD:
                 #check if connected to wifi
                 ## SYNC
-                upload.sync()
+                success = upload.sync()
 
-                log.debug('upload complete', DATE, hour)
+                if success:
+                    log.debug('upload complete on {}, hour = {}'.format(DATE, hour))
 
-                with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
-                    lines=f.readlines()
-                with open (os.path.join(__RDIR__,'.uploads'),'w') as f:
-                    for line in lines:
-                        f.write(sub(r'LAST_UPLOAD = '+LAST_UPLOAD, 'LAST_UPLOAD = '+DATE, line))
+                    with open (os.path.join(__RDIR__,'.uploads'),'r') as f:
+                        lines=f.readlines()
+                    with open (os.path.join(__RDIR__,'.uploads'),'w') as f:
+                        for line in lines:
+                            f.write(sub(r'LAST_UPLOAD = '+LAST_UPLOAD, 'LAST_UPLOAD = '+DATE, line))
 
-                LAST_UPLOAD = DATE
+                    LAST_UPLOAD = DATE
 
-            ## update time!
-            log.info(os.popen('sudo timedatectl &').read())
+                else:
+                    log.debug('Upload failed on {}, hour = {}'.format(DATE, hour))
+
+                ## update time!
+                log.info(os.popen('sudo timedatectl &').read())
 
             ## run git pull
             branchname = os.popen("git rev-parse --abbrev-ref HEAD").read()[:-1]
