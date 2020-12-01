@@ -134,19 +134,13 @@ def copydb(file_name,SERIAL):
 
 
 
-def sync(SERIAL,conn):
+def sync(SERIAL,__RDIR__):
 
     import pysftp
     from time import sleep
     from random import randint
 
     sleep(randint(10,300))  # Wait a random amount of time between 10 secs and 10 mins to limit overloading serverpi
-
-    # if we are root, write to root dir
-    user = os.popen('echo $USER').read().strip()
-
-    if user == 'root': __RDIR__ = '/root'
-    else: __RDIR__ = '/home/'+user
 
     key_pass = readpassphrase(__RDIR__)
 
@@ -173,8 +167,9 @@ def sync(SERIAL,conn):
 
     for i in range (10):
         try:
-            with pysftp.Connection(host="BBServer1-1.local", username="serverpi", private_key=private_key, private_key_pass=key_pass, cnopts=cnopts) as srv:
+            with pysftp.Connection(host="10.3.141.1", username="serverpi", private_key=private_key, private_key_pass=key_pass, cnopts=cnopts) as srv:
                 print ("Connection Open")
+                srv.timeout(10.0)
                 if srv.exists(destination):
                     srv.chdir(destination)
                     print("Uploading db file to serverpi")
@@ -187,6 +182,8 @@ def sync(SERIAL,conn):
                     print ("File transfered - "+source)
                 else:
                     print("Destination does not exist")
+                    success = False
+                    continue
                 success = True
                 break
         except Exception as e:
