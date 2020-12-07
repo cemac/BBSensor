@@ -27,8 +27,8 @@ from board import SCL, SDA
 import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
-import os 
-
+import os,time 
+ 
 os.system('i2cdetect -y 1')
 # Create the I2C interface.
 i2c = busio.I2C(SCL, SDA)
@@ -70,8 +70,8 @@ font = ImageFont.load_default()
 # same directory as the python script!
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
 # font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 9)
-
-while True:
+start = time.time()
+while time.time()-start < 60:
 
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
@@ -93,8 +93,12 @@ while True:
     draw.text((x, top + 8), CPU, font=font, fill=255)
     draw.text((x, top + 16), MemUsage, font=font, fill=255)
     draw.text((x, top + 25), Disk, font=font, fill=255)
-
+    
     # Display image.
     disp.image(image)
     disp.show()
     time.sleep(0.1)
+
+
+draw.rectangle((0, 0, width, height), outline=0, fill=0)
+draw.text((x, top + 0), "%20s"%'Sensor Monitor v1.0', font=font, fill=255)

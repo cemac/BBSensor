@@ -68,28 +68,7 @@ gpsdaemon = gps.init(wait=False)
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
 
-########################################################
-## Bluetooth setup
-########################################################
-# '''
-# Start bluetooth DEBUG
-# '''
-# if DEBUG:
-#     print('debug:', DEBUG)
-#     try:
-#         # Load watch command for bluetooth
-#         # do this after 10 second delay from code to allow pi to finish booting.
-#         bserial = True
-#         os.system("screen -S ble -X stuff 'sudo rfcomm release rfcomm1 1 ^M' ")
-#         os.system("screen -S ble -X stuff 'sudo rfcomm watch rfcomm1 1 & ^M' ")
-#         # open('/dev/rfcomm1','w',1)
-#         # bserial.write('starting')
-#         # bserial.close()
-#         print('debug using bluetooth serial: on')
-#     except:print('no bluetooth serial')
-#
-########################################################
-########################################################
+
 
 def interrupt(channel):
     log.warning("Pull Down on GPIO 21 detected: exiting program")
@@ -332,3 +311,14 @@ if not (os.system("git status --branch --porcelain | grep -q behind")):
     now = datetime.utcnow().strftime("%F %X")
     log.critical('Updates available. We need to reboot. Shutting down at %s'%now)
     os.system("sudo reboot")
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
