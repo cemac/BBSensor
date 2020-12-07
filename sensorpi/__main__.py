@@ -64,10 +64,6 @@ if OLED_module:
     from .SensorMod import oled
     oled.standby()
 
-
-
-
-
 # Check Modules
 from .tests import pyvers
 from .log_manager import getlog
@@ -77,21 +73,19 @@ log.info('########################################################'.replace('#',
 
 # Exec modules
 from .exitcondition import GPIO
-from . import power
+from .SensorMod import power
 from .crypt import scramble
-from . import db
-from .db import builddb, __RDIR__
-from . import upload
-from . import gps
-from . import R1
+from .SensorMod import db
+from db import builddb, __RDIR__
+from .SensorMod import upload
+from .SensorMod import gps
+from .SensorMod import R1
 
 
 
 ########################################################
 ##  Setup
 ########################################################
-
-
 gpsdaemon = gps.init(wait=False)
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
@@ -197,7 +191,7 @@ def runcycle():
                 oled.updatedata(now,results[-1])
 
         if STOP:break
-        time.seep(.1) # keep as 1
+        time.sleep(.1) # keep as 1
 
     alpha.off()
     time.sleep(1)# Let the rpi turn off the fan
