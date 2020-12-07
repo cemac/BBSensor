@@ -191,11 +191,12 @@ def runcycle():
                             float(pm['Sampling Period']),
                             int(pm['Reject count glitch']),
                             unixtime,] )
+                            
+            if OLED_module: 
+                now = str(datetime.utcnow()).split('.')[0]
+                oled.updatedata(now,results[-1])
 
         if STOP:break
-        if OLED_module: 
-            now = str(datetime.utcnow()).split('.')[0]
-            oled.updatedata(now,results[-1])
         time.seep(.1) # keep as 1
 
     alpha.off()
