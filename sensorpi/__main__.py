@@ -66,13 +66,13 @@ if OLED_module:
 
 # Check Modules
 from .tests import pyvers
-from .log_manager import getlog
+from .SensorMod.log_manager import getlog
 log = getlog(__name__)
 print = log.print ## replace print function with a wrapper
 log.info('########################################################'.replace('#','~'))
 
 # Exec modules
-from .exitcondition import GPIO
+from .SensorMod.exitcondition import GPIO
 from .SensorMod import power
 from .crypt import scramble
 from . import db
