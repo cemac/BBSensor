@@ -27,10 +27,43 @@ from datetime import date,datetime
 from re import sub
 
 
-from .SensorMod import oled
 
-oled.standby()
-sys.exit()
+########################################################
+##  Running Parameters
+########################################################
+
+## runtime constants
+SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
+
+
+DHT_module = False
+OLED_module = True
+
+SAMPLE_LENGTH_slow = 60*5
+SAMPLE_LENGTH_fast = 60*1 # in seconds
+SAMPLE_LENGTH = SAMPLE_LENGTH_fast
+# assert SAMPLE_LENGTH > 10
+
+### hours (not inclusive)
+NIGHT = [18,7] # stop 7-7
+SCHOOL = [9,15] # stop 10 -2
+
+DATE   = date.today().strftime("%d/%m/%Y")
+STOP   = False
+TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
+LAST_SAVE = None
+
+
+########################################################
+##  Imports
+########################################################
+
+## conditional imports 
+if DHT_module: from . import DHT
+if OLED_module:
+    from .SensorMod import oled
+    oled.standby()
+
 
 
 
@@ -51,27 +84,13 @@ from .db import builddb, __RDIR__
 from . import upload
 from . import gps
 from . import R1
+
+
+
 ########################################################
-##  Running Parameters
+##  Setup
 ########################################################
 
-## runtime constants
-SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
-DATE   = date.today().strftime("%d/%m/%Y")
-STOP   = False
-TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
-LAST_SAVE = None
-DHT_module = False
-if DHT_module: from . import DHT
-
-SAMPLE_LENGTH_slow = 60*5
-SAMPLE_LENGTH_fast = 60*1 # in seconds
-SAMPLE_LENGTH = SAMPLE_LENGTH_fast
-# assert SAMPLE_LENGTH > 10
-
-### hours (not inclusive)
-NIGHT = [18,7] # stop 7-7
-SCHOOL = [9,15] # stop 10 -2
 
 gpsdaemon = gps.init(wait=False)
 alpha = R1.alpha
@@ -174,7 +193,10 @@ def runcycle():
                             unixtime,] )
 
         if STOP:break
-        time.sleep(.1) # keep as 1
+        if OLED_module: 
+            now = str(datetime.utcnow()).split('.')[0]
+            oled.updatedata(now,results[-1])
+        time.seep(.1) # keep as 1
 
     alpha.off()
     time.sleep(1)# Let the rpi turn off the fan
@@ -316,6 +338,7 @@ log.info('exiting - STOP: %s'%STOP)
 db.conn.commit()
 db.conn.close()
 power.ledon()
+if OLED_module: oled.shutdown()
 if not (os.system("git status --branch --porcelain | grep -q behind")):
     now = datetime.utcnow().strftime("%F %X")
     log.critical('Updates available. We need to reboot. Shutting down at %s'%now)
