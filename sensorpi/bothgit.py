@@ -1,6 +1,6 @@
 import os,sys 
 
-commit = '_'+' '.join(sys.argv[1:])
+commit = 'AutoCommit '+' '.join(sys.argv[1:])
 
 os.system('cd SensorMod && git add -A && git commit -m "%s" && git push'%commit)
 
