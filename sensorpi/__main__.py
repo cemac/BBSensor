@@ -76,7 +76,7 @@ from .SensorMod.exitcondition import GPIO
 from .SensorMod import power
 from .crypt import scramble
 from . import db
-from db import builddb, __RDIR__
+from .db import builddb, __RDIR__
 from .SensorMod import upload
 from .SensorMod import gps
 from .SensorMod import R1
