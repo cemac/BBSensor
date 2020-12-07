@@ -1,4 +1,4 @@
-from .. import DHT
+from ..SensorMod import DHT
 
 counter = 20
 while counter:

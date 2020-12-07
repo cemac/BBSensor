@@ -11,7 +11,7 @@ import time,re,sys
 ###########################
 
 
-from .. import gps
+from ..Sensormod import gps
 
 loc = gps.init()
 

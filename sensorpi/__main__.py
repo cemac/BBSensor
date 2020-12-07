@@ -243,6 +243,7 @@ while True:
         if gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
         power.ledon()
         SAMPLE_LENGTH = -1 # Dont run !  SAMPLE_LENGTH_slow
+        if OLED_module: oled.standby()
         time.sleep(30*60) # sleep 0.5h
         TYPE = 4
 
@@ -307,6 +308,8 @@ while True:
 
         # sleep for 18 minutes - check break statement every minute
 
+
+        if OLED_module: oled.standby()
         # check if we are trying to stop the device every minute
         for i in range(14):
             time.sleep(60) #5 sets of 5 min
