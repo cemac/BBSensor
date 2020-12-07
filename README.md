@@ -45,6 +45,8 @@ This contains:
 `python -m serverpi.db` and type `yes`
 
 
+## If using OLED
+Set oled in sensorpi/__main__ as true
 
 
 ### Debug corruption on device
