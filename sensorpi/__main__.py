@@ -26,6 +26,15 @@ import time,sys,os
 from datetime import date,datetime
 from re import sub
 
+
+from .SensorMod import oled
+
+oled.standby()
+sys.exit()
+
+
+
+
 # Check Modules
 from .tests import pyvers
 from .log_manager import getlog

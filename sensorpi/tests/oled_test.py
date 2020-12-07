@@ -20,7 +20,6 @@
 # THE SOFTWARE.
 
 
-import time
 import subprocess
 
 from board import SCL, SDA
@@ -107,6 +106,6 @@ while timeout < 0:
 ### end on info
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 draw.text((x, top + 0), "%20s"%'Sensor Monitor v1.0', font=font, fill=255)
-draw.text((x, top + 50), "IP: " + IP, font=font, fill=255)
+draw.text((x, top + 16), "IP: " + IP, font=font, fill=255)
 disp.image(image)
 disp.show()
