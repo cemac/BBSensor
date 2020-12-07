@@ -71,7 +71,7 @@ font = ImageFont.load_default()
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
 # font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 9)
 start = time.time()
-timeout = 1000
+timeout = -1
 while timeout < 0:
     
     timeout = time.time()-start - 60
