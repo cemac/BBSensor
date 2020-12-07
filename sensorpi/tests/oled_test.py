@@ -71,8 +71,11 @@ font = ImageFont.load_default()
 # Some other nice fonts to try: http://www.dafont.com/bitmap.php
 # font = ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf', 9)
 start = time.time()
-while time.time()-start < 60:
-
+timeout = 1000
+while timeout < 0:
+    
+    timeout = time.time()-start - 60
+    if timeout%5 ==0 : print('Time Left:',timeout)
     # Draw a black filled box to clear the image.
     draw.rectangle((0, 0, width, height), outline=0, fill=0)
 
@@ -100,5 +103,10 @@ while time.time()-start < 60:
     time.sleep(0.1)
 
 
+
+### end on info
 draw.rectangle((0, 0, width, height), outline=0, fill=0)
 draw.text((x, top + 0), "%20s"%'Sensor Monitor v1.0', font=font, fill=255)
+draw.text((x, top + 50), "IP: " + IP, font=font, fill=255)
+disp.image(image)
+disp.show()
