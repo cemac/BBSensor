@@ -23,7 +23,7 @@ if 'opc' in args:
 if 'gps' in args:
   from . import gps_test
 if 'oled' in args:
-  from . import opctest
+  from . import oled_test
 
 
 
