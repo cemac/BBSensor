@@ -244,7 +244,7 @@ while True:
         power.ledon()
         SAMPLE_LENGTH = -1 # Dont run !  SAMPLE_LENGTH_slow
         if OLED_module: oled.standby()
-        time.sleep(30*60) # sleep 0.5h
+        time.sleep(30)#*60) # sleep 0.5h
         TYPE = 4
 
     elif (hour > SCHOOL[0]) and (hour < SCHOOL[1]): # >7 <9 & >15 <18 utc (9-15)
