@@ -1,5 +1,5 @@
 import sqlite3
-from ..log_manager import getlog
+from ..SensorMod.log_manager import getlog
 log = getlog(__file__)
 
 def builddb(conn):
