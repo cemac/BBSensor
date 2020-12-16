@@ -33,25 +33,27 @@ from re import sub
 ########################################################
 
 ## runtime constants
-SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
 
+CSV = TRUE
 
 DHT_module = False
+
+
+### hours (not inclusive)
+NIGHT = [18,7] # stop 7-7
+SCHOOL = [9,15] # stop 10 -2
 
 SAMPLE_LENGTH_slow = 60*5
 SAMPLE_LENGTH_fast = 60*1 # in seconds
 SAMPLE_LENGTH = SAMPLE_LENGTH_fast
 # assert SAMPLE_LENGTH > 10
 
-### hours (not inclusive)
-NIGHT = [18,7] # stop 7-7
-SCHOOL = [9,15] # stop 10 -2
 
 DATE   = date.today().strftime("%d/%m/%Y")
 STOP   = False
 TYPE   = 2 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
 LAST_SAVE = None
-
+SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 char key
 
 ########################################################
 ##  Imports
@@ -82,8 +84,14 @@ log.info('USING OLED = %s'%OLED_module)
 from .SensorMod.exitcondition import GPIO
 from .SensorMod import power
 from .crypt import scramble
-from . import db
-from .db import builddb, __RDIR__
+if not CSV:
+    from . import db
+    from .db import builddb, __RDIR__
+else: 
+    from .db import __RDIR__
+    CSV = __RDIR__+'/simplesensor.csv'
+    from pandas import DataFrame
+    # inefficient I know, but it will only be used for testing
 from .SensorMod import upload
 from .SensorMod import gps
 from .SensorMod import R1
@@ -179,10 +187,8 @@ def runcycle():
                 temp = pm['Temperature']
                 rh   = pm[  'Humidity' ]
 
-            if gpsdaemon :
-                loc     = gps.last.copy()
-            else:
-                loc     = dict(zip('gpstime lat lon alt'.split(),['000000',0,0,0]))
+            if gpsdaemon : loc = gps.last.copy()
+            else: loc = dict(zip('gpstime lat lon alt'.split(),['000000',0,0,0]))
                 
             unixtime = int(datetime.utcnow().strftime("%s")) # to the second
             
@@ -237,14 +243,19 @@ while True:
         d = runcycle()
 
         ''' add to db'''
-        db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME) \
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d );
-        db.conn.commit() # dont forget to commit!
+        if not CSV:
+            db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME) \
+                  VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d );
+            db.conn.commit() # dont forget to commit!
+            log.info('DB saved at {}'.format(datetime.utcnow().strftime("%X")))
+        else:
+            DataFrame(d).to_csv(CSV,mode='a')
+            log.info('CSV saved at {}'.format(datetime.utcnow().strftime("%X")))
 
         #if DEBUG:
                 # if bserial : os.system("screen -S ble -X stuff 'sudo echo \"%s\" > /dev/rfcomm1 ^M' " %'_'.join([str(i) for i in d[-1]]))
 
-        log.info('DB saved at {}'.format(datetime.utcnow().strftime("%X")))
+        
 
         power.ledon()
 
@@ -253,8 +264,10 @@ while True:
 
     hour = datetime.now().hour#gps.last.copy()['gpstime'][:2]
 
+    if CSV:
+        log.debug('CSV - skipping conditionals')
 
-    if (hour > NIGHT[0]) or (hour < NIGHT[1]): #>18 | <7
+    elif (hour > NIGHT[0]) or (hour < NIGHT[1]): #>18 | <7
         ''' hometime - SLEEP '''
         log.debug('NightSleep, hour={}'.format(hour))
         if gpsdaemon and gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
@@ -350,8 +363,9 @@ while True:
 
 
 log.info('exiting - STOP: %s'%STOP)
-db.conn.commit()
-db.conn.close()
+if not CSV:
+    db.conn.commit()
+    db.conn.close()
 power.ledon()
 if OLED_module: oled.shutdown()
 if not (os.system("git status --branch --porcelain | grep -q behind")):
