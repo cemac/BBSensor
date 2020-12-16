@@ -34,6 +34,8 @@ pip3 install pysftp;
 sudo pip3 install adafruit-circuitpython-lis3dh
 sudo apt install libopenjp2-7 libopenjp2-7-dev libopenjp2-tools
 pip3 install pillow
+pip3 install adafruit-extended-bus
+
 #/dev/ttyS0 is owned by the user root and the group dialout, so to be able to acesss the serial device, I would add myself to the dialout group:
 
 sudo usermod -a -G tty $USER ;
