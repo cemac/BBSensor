@@ -43,6 +43,7 @@ DHT_module = False
 NIGHT = [18,7] # stop 7-7
 SCHOOL = [9,15] # stop 10 -2
 
+#how often we save to file
 SAMPLE_LENGTH_slow = 60*5
 SAMPLE_LENGTH_fast = 60*1 # in seconds
 SAMPLE_LENGTH = SAMPLE_LENGTH_fast
@@ -90,6 +91,7 @@ if not CSV:
 else: 
     from .db import __RDIR__
     CSV = __RDIR__+'/simplesensor.csv'
+    SAMPLE_LENGTH = SAMPLE_LENGTH_slow
     from pandas import DataFrame
     columns='SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME'.split(',')
     # inefficient I know, but it will only be used for testing
