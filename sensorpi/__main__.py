@@ -34,7 +34,7 @@ from re import sub
 
 ## runtime constants
 
-CSV = True
+CSV = False
 
 DHT_module = False
 
