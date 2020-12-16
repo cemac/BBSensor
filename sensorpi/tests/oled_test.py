@@ -38,6 +38,9 @@ print('oldpins', SCL,SDA)
 # gpio names
 SCL = 23
 SDA = 22
+
+SCL = 3
+SDA = 3
 bus = 2
 i2c = busio.I2C(SCL, SDA,bus)
 
