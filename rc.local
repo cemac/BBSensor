@@ -14,7 +14,6 @@ fi
 
 sudo rfkill block bluetooth;
 
-sudo timedatectl >> /root/git.log;
 
 LOC='/root'
 
@@ -33,6 +32,7 @@ while [[ $count -ne 0 ]] ; do
     ((count = count - 1))                  # So we don't go forever.
 done
 
+
 if [[ $rc -eq 0 ]] ; then                  # Make final determination.
 
     RETRIES=5
@@ -50,7 +50,27 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
         let COUNT=$COUNT+1
         sleep $DELAY
     done
+       
 fi
+
+
+# SYNC RTC
+sudo timedatectl >> ${LOC}/git.log 2>&1;
+
+if sudo i2cdetect -y 1 | grep 68 ; then
+    echo 'RTC found;
+    dtoverlay i2c-rtc pcf8523=true wakeup-source=true;
+    if [ $? -eq 0 ]; 
+      then
+          sudo hwclock -w; # copy from system clock
+      else
+          sudo hwclock -s; # copy to system clock
+    fi;
+fi;
+
+
+
+
 
 # transfer rules of usb transfer if they dont exist and reboot. 
 if [ ! -f "/etc/udev/rules.d/optional_usb.rules" ]; then
@@ -63,7 +83,7 @@ if [ ! -f "/etc/udev/rules.d/optional_usb.rules" ]; then
     sudo reboot
 fi
 
-sudo timedatectl >> ${LOC}/git.log 2>&1;
+
 
 cd ${LOC}/BBSensor && sudo python3 -m sensorpi >> /root/sensor.log &
 
