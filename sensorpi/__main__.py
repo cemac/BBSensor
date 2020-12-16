@@ -252,7 +252,7 @@ while True:
             log.info('DB saved at {}'.format(datetime.utcnow().strftime("%X")))
         else:
             oled.standby(message = "   --  write csv  --   ")
-            DataFrame(d).to_csv(CSV,mode='a',columns=columns)
+            DataFrame(d,columns=columns).to_csv(CSV,mode='a')
             log.info('CSV saved at {}'.format(datetime.utcnow().strftime("%X")))
 
         #if DEBUG:
