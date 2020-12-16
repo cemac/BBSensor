@@ -94,7 +94,7 @@ from .SensorMod import R1
 ##  Setup
 ########################################################
 gpsdaemon = gps.init(wait=False)
-if not gpsdaemon: log.WARNING('NO GPS FOUND!')
+if not gpsdaemon: log.warning('NO GPS FOUND!')
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
 
