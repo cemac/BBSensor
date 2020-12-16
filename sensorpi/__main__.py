@@ -37,7 +37,6 @@ SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 
 
 
 DHT_module = False
-OLED_module = True
 
 SAMPLE_LENGTH_slow = 60*5
 SAMPLE_LENGTH_fast = 60*1 # in seconds
@@ -60,9 +59,9 @@ LAST_SAVE = None
 
 ## conditional imports 
 if DHT_module: from . import DHT
-if OLED_module:
-    from .SensorMod import oled
-    oled.standby()
+    
+
+
 
 # Check Modules
 from .tests import pyvers
@@ -70,6 +69,14 @@ from .SensorMod.log_manager import getlog
 log = getlog(__name__)
 print = log.print ## replace print function with a wrapper
 log.info('########################################################'.replace('#','~'))
+
+try:
+    from .SensorMod import oled
+    oled.standby()
+    OLED_module=True
+except ImportError:
+    OLED_module=False
+log.info('USING OLED = ' + OLED_module)
 
 # Exec modules
 from .SensorMod.exitcondition import GPIO
