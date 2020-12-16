@@ -94,6 +94,7 @@ from .SensorMod import R1
 ##  Setup
 ########################################################
 gpsdaemon = gps.init(wait=False)
+if not gpsdaemon: log.WARNING('NO GPS FOUND!')
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
 
@@ -176,7 +177,11 @@ def runcycle():
                 temp = pm['Temperature']
                 rh   = pm[  'Humidity' ]
 
-            loc     = gps.last.copy()
+            if gpsdaemon :
+                loc     = gps.last.copy()
+            else:
+                loc     = dict(zip('gpstime lat lon alt'.split(),[0,0,0,0]))
+                
             unixtime = int(datetime.utcnow().strftime("%s")) # to the second
 
             results.append( [
@@ -247,7 +252,7 @@ while True:
     if (hour > NIGHT[0]) or (hour < NIGHT[1]): #>18 | <7
         ''' hometime - SLEEP '''
         log.debug('NightSleep, hour={}'.format(hour))
-        if gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
+        if gpsdaemon and gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
         power.ledon()
         SAMPLE_LENGTH = -1 # Dont run !  SAMPLE_LENGTH_slow
         if OLED_module: oled.standby()
@@ -261,7 +266,7 @@ while True:
 
         DATE = date.today().strftime("%d/%m/%Y")
 
-        if gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
+        if gpsdaemon and gpsdaemon.is_alive() == True: gps.stop_event.set() #stop gps
 
         log.debug('savecondition: Date = {}, Last Save = {}'.format(DATE,LAST_SAVE))
         if DATE != LAST_SAVE:
@@ -326,9 +331,9 @@ while True:
     else:
         log.debug('en route - FASTSAMPLE, hour={}'.format(hour))
 
-        log.debug('GPS alive = {}'.format(gpsdaemon.is_alive()))
+        if gpsdaemon: log.debug('GPS alive = {}'.format(gpsdaemon.is_alive()))
 
-        if gpsdaemon.is_alive() == False:
+        if gpsdaemon and gpsdaemon.is_alive() == False:
             gpsdaemon = gps.init(wait=False)
 
         SAMPLE_LENGTH = SAMPLE_LENGTH_fast
