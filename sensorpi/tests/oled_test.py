@@ -34,8 +34,10 @@ os.system('i2cdetect -y 2')
 
 # now using bus 2 so overwrite
 print('oldpins', SCL,SDA)
-SCL = 16
-SDA = 15
+
+# gpio names
+SCL = 23
+SDA = 22
 i2c = busio.I2C(SCL, SDA)
 
 # Create the SSD1306 OLED class.
