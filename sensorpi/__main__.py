@@ -180,7 +180,7 @@ def runcycle():
             if gpsdaemon :
                 loc     = gps.last.copy()
             else:
-                loc     = dict(zip('gpstime lat lon alt'.split(),[0,0,0,0]))
+                loc     = dict(zip('gpstime lat lon alt'.split(),['000000',0,0,0]))
                 
             unixtime = int(datetime.utcnow().strftime("%s")) # to the second
 
