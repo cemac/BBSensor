@@ -27,9 +27,15 @@ import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 import os,time 
- 
-os.system('i2cdetect -y 1')
+
+os.system('dtoverlay i2c-gpio bus=2 i2c_gpio_sda=22 i2c_gpio_scl=23')
+os.system('i2cdetect -y 2')
 # Create the I2C interface.
+
+# now using bus 2 so overwrite
+print('oldpins', SCL,SDA)
+SCL = 16
+SDA = 15
 i2c = busio.I2C(SCL, SDA)
 
 # Create the SSD1306 OLED class.
