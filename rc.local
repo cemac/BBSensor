@@ -42,7 +42,6 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
     # Update the repo, with retries incase the sensor is not connected to the internet.
 
     while [ $COUNT -lt $RETRIES ]; do
-        echo 'try $COUNT';
         cd ${LOC}/BBSensor && git pull --recurse-submodules >> ${LOC}/git.log 2>&1;
         echo 'github';
         if [ $? -eq 0 ]; then
