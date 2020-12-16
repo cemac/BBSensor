@@ -19,6 +19,7 @@ def builddb(conn):
                      PM10         REAL        NOT NULL,
                      T            REAL        NOT NULL,
                      RH           REAL        NOT NULL,
+                     BINS         BLOB        NOT NULL,
                      SP           REAL        NOT NULL,
                      RC           INT         NOT NULL,
                      UNIXTIME     INT         NOT NULL
