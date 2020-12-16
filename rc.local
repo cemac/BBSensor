@@ -45,7 +45,7 @@ if [[ $rc -eq 0 ]] ; then                  # Make final determination.
         cd ${LOC}/BBSensor && git pull --recurse-submodules >> ${LOC}/git.log 2>&1;
         # run the super command just incase
         #cd ${LOC}/BBSensor &&git pull && git submodule init && git submodule update && git submodule status 
-        cd ${LOC}/BBSensor/sensorpi/SensorMod/2>&1;
+        cd ${LOC}/BBSensor/sensorpi/SensorMod && git pull >> ${LOC}/git.log 2>&1;
         echo 'github';
         if [ $? -eq 0 ]; then
             RETRIES=0
