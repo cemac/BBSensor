@@ -72,7 +72,7 @@ log.info('########################################################'.replace('#',
 
 try:
     from .SensorMod import oled
-    oled.standby()
+    oled.standby(message = "   -- loading... --   ")
     OLED_module=True
 except ImportError:
     OLED_module=False
@@ -94,7 +94,9 @@ from .SensorMod import R1
 ##  Setup
 ########################################################
 gpsdaemon = gps.init(wait=False)
-if not gpsdaemon: log.warning('NO GPS FOUND!')
+if not gpsdaemon: 
+    log.warning('NO GPS FOUND!')
+    if OLED_module : oled.standby(message = "   -- NO GLONASS --   ")
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
 
