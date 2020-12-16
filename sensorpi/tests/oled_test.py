@@ -42,7 +42,9 @@ SDA = 22
 SCL = 3
 SDA = 3
 bus = 2
-i2c = busio.I2C(SCL, SDA,bus)
+print(getattrs(busio))
+i2c = busio.I2C((SCL, SDA,bus))
+
 
 # Create the SSD1306 OLED class.
 # The first two parameters are the pixel width and pixel height.  Change these
