@@ -76,7 +76,7 @@ try:
     OLED_module=True
 except ImportError:
     OLED_module=False
-log.info('USING OLED = ' + OLED_module)
+log.info('USING OLED = %s'%OLED_module)
 
 # Exec modules
 from .SensorMod.exitcondition import GPIO
