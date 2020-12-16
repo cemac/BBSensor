@@ -22,11 +22,18 @@
 
 import subprocess
 
-from board import SCL, SDA
-import busio
+# from board import SCL, SDA
+# import busio
 from PIL import Image, ImageDraw, ImageFont
 import adafruit_ssd1306
 import os,time 
+
+from adafruit_extended_bus import ExtendedI2C as I2C
+import adafruit_bme280
+
+# Create library object using our Extended Bus I2C port
+i2c = I2C(2) # Device is /dev/i2c-2
+
 
 os.system('dtoverlay i2c-gpio bus=2 i2c_gpio_sda=22 i2c_gpio_scl=23')
 os.system('i2cdetect -y 2')
@@ -36,13 +43,10 @@ os.system('i2cdetect -y 2')
 print('oldpins', SCL,SDA)
 
 # gpio names
-SCL = 23
-SDA = 22
-
-SCL = 3
-SDA = 3
-bus = 2
-i2c = busio.I2C((SCL, SDA,bus))
+# SCL = 23
+# SDA = 22
+# bus = 2
+# # i2c = busio.I2C((SCL, SDA,bus))
 
 
 # Create the SSD1306 OLED class.
