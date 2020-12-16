@@ -40,7 +40,6 @@ os.system('i2cdetect -y 2')
 # Create the I2C interface.
 
 # now using bus 2 so overwrite
-print('oldpins', SCL,SDA)
 
 # gpio names
 # SCL = 23
