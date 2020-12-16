@@ -22,7 +22,7 @@ __email__ = "D.Ellis@leeds.ac.uk"
 __status__ = "Prototype"
 
 # Built-in/Generic Imports
-import time,sys,os
+import time,sys,os,pickle
 from datetime import date,datetime
 from re import sub
 
@@ -185,6 +185,8 @@ def runcycle():
                 loc     = dict(zip('gpstime lat lon alt'.split(),['000000',0,0,0]))
                 
             unixtime = int(datetime.utcnow().strftime("%s")) # to the second
+            
+            bins = pickle.dumps([float(pm['Bin %d'%i]) for i in range(16)])
 
             results.append( [
                             SERIAL,
@@ -196,6 +198,7 @@ def runcycle():
                             float(pm['PM10']),
                             float(temp),
                             float(rh),
+                            bins,
                             float(pm['Sampling Period']),
                             int(pm['Reject count glitch']),
                             unixtime,] )
@@ -234,8 +237,8 @@ while True:
         d = runcycle()
 
         ''' add to db'''
-        db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,SP,RC,UNIXTIME) \
-              VALUES (?,?,?,?,?,?,?,?,?,?,?,?)", d );
+        db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME) \
+              VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d );
         db.conn.commit() # dont forget to commit!
 
         #if DEBUG:
