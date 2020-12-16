@@ -38,7 +38,8 @@ print('oldpins', SCL,SDA)
 # gpio names
 SCL = 23
 SDA = 22
-i2c = busio.I2C(SCL, SDA)
+bus = 2
+i2c = busio.I2C(SCL, SDA,bus)
 
 # Create the SSD1306 OLED class.
 # The first two parameters are the pixel width and pixel height.  Change these
