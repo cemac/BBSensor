@@ -91,6 +91,7 @@ else:
     from .db import __RDIR__
     CSV = __RDIR__+'/simplesensor.csv'
     from pandas import DataFrame
+    columns='SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME'.split(',')
     # inefficient I know, but it will only be used for testing
 from .SensorMod import upload
 from .SensorMod import gps
@@ -251,7 +252,7 @@ while True:
             log.info('DB saved at {}'.format(datetime.utcnow().strftime("%X")))
         else:
             oled.standby(message = "   --  write csv  --   ")
-            DataFrame(d).to_csv(CSV,mode='a')
+            DataFrame(d).to_csv(CSV,mode='a',columns=columns)
             log.info('CSV saved at {}'.format(datetime.utcnow().strftime("%X")))
 
         #if DEBUG:
