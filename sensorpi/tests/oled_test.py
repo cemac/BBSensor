@@ -29,7 +29,7 @@ import adafruit_ssd1306
 import os,time 
 
 from adafruit_extended_bus import ExtendedI2C as I2C
-import adafruit_bme280
+
 
 # Create library object using our Extended Bus I2C port
 i2c = I2C(2) # Device is /dev/i2c-2
