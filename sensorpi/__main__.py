@@ -12,7 +12,7 @@ __author__ = "Dan Ellis, Christopher Symonds"
 __copyright__ = "Copyright 2020, University of Leeds"
 __credits__ = ["Dan Ellis", "Christopher Symonds", "Jim McQuaid", "Kirsty Pringle"]
 __license__ = "MIT"
-__version__ = "0.4.2"
+__version__ = "0.4.5"
 __maintainer__ = "C. Symonds"
 __email__ = "C.C.Symonds@leeds.ac.uk"
 __status__ = "Prototype"
@@ -43,6 +43,7 @@ from . import db
 from .db import builddb, __RDIR__
 from . import upload
 from . import R1
+from . import gps
 
 ########################################################
 ##  Running Parameters
@@ -53,14 +54,22 @@ SERIAL = os.popen('cat /sys/firmware/devicetree/base/serial-number').read() #16 
 DATE   = date.today().strftime("%d/%m/%Y")
 STOP   = False
 SAMPLE_LENGTH = 10
-TYPE   = 3 # { 1 = static, 2 = dynamic, 3 = isolated_static, 4 = home/school}
+TYPE   = 1 # { 1 = static, 2 = dynamic}
 LAST_SAVE = None
 DHT_module = False
 if DHT_module: from . import DHT
 
+
 ### hours (not inclusive)
 SCHOOL = [9,15] # stage db during school hours
 
+try:
+    gpsdaemon = gps.init(wait=False)
+    TYPE = 2
+    log.info("GPS Connected - Running in portable mode")
+except:
+    TYPE = 1
+    log.info("No GPS connected - running in stationary mode")
 alpha = R1.alpha
 loading = power.blink_nonblock_inf()
 
@@ -138,10 +147,15 @@ def runcycle():
                 temp = pm['Temperature']
                 rh   = pm[  'Humidity' ]
 
+            if TYPE == 2:
+                loc = gps.last.copy()
+            else:
+                loc = {'gpstime':now.strftime("%H%M%S"),'lat':lat,'lon':lon,'alt':alt}
+
             results.append( [
                 SERIAL,
                 TYPE,
-                now.strftime("%H%M%S"),
+                loc['gpstime'][:6],
                 scramble(('%(lat)s_%(lon)s_%(alt)s'%loc).encode('utf-8')),
                 float(pm['PM1']),
                 float(pm['PM2.5']),
@@ -205,6 +219,9 @@ while True:
         ''' rfkill block wifi; to turn it on, rfkill unblock wifi. For Bluetooth, rfkill block bluetooth and rfkill unblock bluetooth.'''
 
         if DATE != LAST_SAVE:
+
+            if TYPE == 2:
+                if gpsdaemon.is_alive() == False: gpsdaemon = gps.init(wait=False)
 
             if upload.online():
                 #check if connected to wifi
