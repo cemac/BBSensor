@@ -217,7 +217,7 @@ def runcycle():
                 oled.updatedata(now,results[-1])
 
         if STOP:break
-        time.sleep(.1) # keep as 1
+        time.sleep(1) # keep as 1
 
     alpha.off()
     time.sleep(1)# Let the rpi turn off the fan
