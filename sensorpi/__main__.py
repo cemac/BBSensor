@@ -247,13 +247,13 @@ while True:
 
         ''' add to db'''
         if not CSV:
-            oled.standby(message = "   --  write db  --   ")
+            if OLED_module: oled.standby(message = "   --  write db  --   ")
             db.conn.executemany("INSERT INTO MEASUREMENTS (SERIAL,TYPE,TIME,LOC,PM1,PM3,PM10,T,RH,BINS,SP,RC,UNIXTIME) \
                   VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", d );
             db.conn.commit() # dont forget to commit!
             log.info('DB saved at {}'.format(datetime.utcnow().strftime("%X")))
         else:
-            oled.standby(message = "   --  write csv  --   ")
+            if OLED_module: oled.standby(message = "   --  write csv  --   ")
             DataFrame(d,columns=columns).to_csv(CSV,mode='a')
             log.info('CSV saved at {}'.format(datetime.utcnow().strftime("%X")))
 
