@@ -34,7 +34,7 @@ from re import sub
 
 ## runtime constants
 
-CSV = False
+CSV = True
 
 DHT_module = False
 
@@ -89,6 +89,7 @@ if not CSV:
     from . import db
     from .db import builddb, __RDIR__
 else: 
+    log.critical('WRITING CSV ONLY')
     from .db import __RDIR__
     CSV = __RDIR__+'/simplesensor.csv'
     SAMPLE_LENGTH = SAMPLE_LENGTH_slow
