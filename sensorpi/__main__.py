@@ -191,11 +191,11 @@ def runcycle():
                 rh   = pm[  'Humidity' ]
 
             if gpsdaemon : loc = gps.last.copy()
-            else: loc = dict(zip('gpstime lat lon alt'.split(),['000000',0,0,0]))
+            else: loc = dict(zip('gpstime lat lon alt'.split(),['000000','','','']))
                 
             unixtime = int(datetime.utcnow().strftime("%s")) # to the second
             
-            bins = pickle.dumps([float(pm['Bin %d'%i]) for i in range(16)])
+            bins = pickle.dumps([float(pm['Bin %s'%i]) for i in range(16)])
 
             results.append( [
                             SERIAL,
