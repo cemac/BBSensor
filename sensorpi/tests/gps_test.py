@@ -11,9 +11,10 @@ import time,re,sys
 ###########################
 
 
-from ..Sensormod import gps
+from ..SensorMod import gps
 
 loc = gps.init()
+print(loc)
 
 print('############# BEGIN ############')
 
