@@ -13,7 +13,7 @@ fi
 #sudo ntpd -q -g >> /root/time.log
 
 sudo rfkill block bluetooth;
-
+alias python='python3'
 
 LOC='/root'
 
