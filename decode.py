@@ -17,7 +17,7 @@ sudo apt install python3-numpy
 '''
 
 __KEY__ = "/Users/wolfiex/bbkey/decrypt.pem"
-__DB__ = './0000000027a0b088_2020_12_19_1745'
+__DB__ = './simplesensor.csv'
 
 #########      Private device only    ##########
 def read_private (filename):
@@ -98,12 +98,39 @@ def get_data(sqlstr = "SELECT * from MEASUREMENTS" ,real=False):
     return df
 
 
+def get_csv(real = False):
+    
+    start = time.time()
+    
+    df = pd.read_csv(__DB__)
+    df = df[df.SERIAL != 'SERIAL'] 
+
+    df['DATE'] = pd.to_datetime(df['UNIXTIME'],unit='s')
+
+    mid = time.time()
+
+    ret = [parse(i) for i in df.LOC.values]
+    df = pd.concat( [df.drop('LOC',axis=1)  ,pd.DataFrame(data = ret,columns='LAT LON ALT'.split())], axis =1  )
+
+    if real: df = df[np.isnan(df.LAT)==False]
 
 
+    end = time.time()
+    total = (end-start)/60
+    parsetime = (end-mid)/60
+
+    print('CSV took %.2f minutes, of which decryption was %.2f minutes'%(total,parsetime))
+
+    return df[df.columns[1:]]
+    
+    
 
 
 if __name__ == '__main__':
-    df = get_data()
+    if '.csv' in __DB__:
+        df = get_csv()
+    else:
+        df = get_data()
     
     df.to_csv('data.csv')
     print (df.columns)
